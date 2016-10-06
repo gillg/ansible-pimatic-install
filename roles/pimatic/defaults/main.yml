@@ -1,0 +1,10 @@
+---
+pimatic_admin_user: admin
+pimatic_admin_password: admin
+pimatic_listen_port: 80
+#pimatic_use_ssl: False
+pimatic_lang: "en"
+pimatic_debug: False
+pimatic_extra_plugins: []
+
+#pimatic_database_type: "sqlite3"

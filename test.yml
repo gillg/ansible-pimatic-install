@@ -1,0 +1,20 @@
+- hosts: domo-servers
+  vars:
+    ansible_user: root
+  #pre_tasks:
+  #  - name: run ansible galaxy
+  #    local_action: command ansible-galaxy install -r requirements.yml --ignore-errors
+      
+  roles:
+    #- { role: ansible-basicserver, extra_packages: [ build-essential, git ] }
+    - basic-install
+    - geerlingguy.security
+    - geerlingguy.firewall
+    - geerlingguy.exim
+    - pimatic
+
+  tasks:
+    - name: Restart
+      command: echo "OK"
+      notify:
+        - restart pimatic

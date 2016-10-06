@@ -1,0 +1,32 @@
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+- include: rhel.yml
+  when: ansible_os_family == "RedHat"
+
+
+- name: Bash setup for root
+  template: src="bashrc.j2" dest="/root/.bashrc"
+
+- name: setup sudoers
+  template: src=sudoers.j2 dest=/etc/sudoers.d/ansible-basicserver
+  when: install_sudoers
+
+- name: setup system user groups
+  with_items: "{{ system_users|default([]) }}"
+  group: name="{{ item.group|default(item.name) }}" state=present
+
+- name: setup system users
+  with_items: "{{ system_users|default([]) }}"
+  user: name="{{ item.name }}" group="{{ item.group|default(item.name) }}" shell=/bin/bash
+
+- name: setup system user SSH keys
+  authorized_key: user="{{ item.0.name }}" key="{{ item.1 }}" state=present
+  with_subelements:
+    - "{{ system_users|default([]) }}"
+    - authorized_keys
+    - skip_missing: True
+
+- name: Bash setup for system users
+  template: src="bashrc.j2" dest="{{ ( "~" + item.name )| expanduser }}/.bashrc"
+  with_items: "{{ system_users | default([]) }}"
+

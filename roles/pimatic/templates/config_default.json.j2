@@ -1,0 +1,73 @@
+{
+  "//": "Please only change this file when pimatic is NOT running, otherwise pimatic will overwrite your changes.",
+  "settings": {
+    "locale": "{{ pimatic_lang }}",
+    "debug": false,
+    "httpServer": {
+      "enabled": true,
+      "port": {{ pimatic_listen_port | default('80')}}
+    },
+    "database": {
+      "client": "sqlite3",
+      "connection": {
+        "filename": "pimatic-database.sqlite"
+      }
+    }
+  },
+  "plugins": [
+    {
+      "plugin": "cron"
+    },
+    {% for plugin in pimatic_extra_plugins %}
+    {
+      "plugin": "{{ plugin }}"
+    },
+    {% endfor %}
+    {
+      "plugin": "mobile-frontend"
+    }
+  ],
+  "devices": [
+
+  ],
+  "rules": [
+
+  ],
+  "pages": [
+    {
+      "id": "favourite",
+      "name": "Favourites",
+      "devices": []
+    }
+  ],
+  "groups": [
+
+  ],
+  "users": [
+    {
+      "username": "{{ pimatic_admin_user | default('admin')}}",
+      "password": "{{ pimatic_admin_password | default('')}}",
+      "role": "admin"
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "permissions": {
+        "pages": "write",
+        "rules": "write",
+        "variables": "write",
+        "messages": "write",
+        "events": "write",
+        "devices": "write",
+        "groups": "write",
+        "plugins": "write",
+        "updates": "write",
+        "database": "write",
+        "config": "write",
+        "controlDevices": true,
+        "restart": true
+      }
+    }
+  ]
+}

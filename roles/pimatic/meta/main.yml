@@ -1,0 +1,31 @@
+---
+dependencies:
+  - { role: geerlingguy.nodejs, nodejs_version: "4.x" }
+  #- geerlingguy.letsencrypt
+  - { role: geerlingguy.certbot }
+  - { role: geerlingguy.nginx }
+  
+galaxy_info:
+  author: Guillaume GILL
+  description: Pimatic automation installation for Linux
+  license: "license (BSD, MIT)"
+  min_ansible_version: 1.9
+  platforms:
+    - name: EL
+      versions:
+      - 6
+      - 7
+    - name: Debian
+      versions:
+      - all
+    - name: Ubuntu
+      versions:
+      - precise
+      - raring
+      - saucy
+      - trusty
+      - xenial
+  galaxy_tags:
+    - development
+    - web
+    - automation

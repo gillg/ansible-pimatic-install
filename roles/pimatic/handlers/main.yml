@@ -1,0 +1,6 @@
+---
+- name: start pimatic
+  service: name=pimatic state=started
+  
+- name: restart pimatic
+  service: name=pimatic state=restarted

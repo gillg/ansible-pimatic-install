@@ -1,0 +1,91 @@
+---
+- name: Configure ENV
+  copy: 
+    src: pimatic.sh
+    dest: /etc/profile.d/pimatic.sh
+    mode: 0644
+  
+- name: Define pimatic home
+  set_fact:
+    pimatic_home: /home/pi/pimatic-app
+  when: pimatic_home is not defined
+  
+- name: Create pimatic home
+  file:
+    state: directory
+    path: "{{ pimatic_home }}"
+    owner: pi
+    
+- name: Install pimatic
+#  npm:
+#    name: pimatic
+#    path: "{{ pimatic_home }}"
+#    production: Yes
+#    state: latest
+  command: npm install pimatic --prefix . --production
+  args:
+    chdir: "{{ pimatic_home }}"
+  
+- stat: 
+    path: "{{ pimatic_home }}/config.json"
+  register: pimatic_conf
+    
+- name: Init default config
+  when: pimatic_conf.stat.exists == False
+  template: 
+    src: "config_default.json.j2"
+    dest: "{{ pimatic_home }}/config.json"
+
+- name: Symlink for config
+  file:
+    path: /etc/pimatic
+    state: directory
+    
+- file:
+    state: link
+    src: "{{ pimatic_home }}/config.json"
+    dest: /etc/pimatic/config.json
+    
+- name: Install pimatic globally
+  command: npm link
+  args:
+    chdir: "{{ pimatic_home }}/node_modules/pimatic/"
+    
+- stat: 
+    path: /etc/init.d/pimatic
+  register: pimatic_initd
+    
+- block:
+  - name: Install service
+    copy:
+      src: pimatic-init-d
+      dest: /etc/init.d/pimatic
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: Configure service
+    command: update-rc.d pimatic defaults
+    notify:
+      - start pimatic
+      
+  when: pimatic_initd.stat.exists == False
+
+- name: Ensure pimatic is started and enabled to start at boot.
+  service: name=pimatic state=started enabled=yes
+
+
+#sudo apt-get install wget
+#cd pimatic-app
+#wget https://raw.githubusercontent.com/pimatic/pimatic/master/install/ssl-setup
+#chmod +x ./ssl-setup
+#./ssl-setup
+
+#"httpsServer": {
+#  "enabled": true,
+#  "port": 443,
+#  "hostname": "",
+#  "keyFile": "ca/pimatic-ssl/private/privkey.pem",
+#  "certFile": "ca/pimatic-ssl/public/cert.pem",
+#  "rootCertFile": "ca/certs/cacert.crt"
+#},
